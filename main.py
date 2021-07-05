@@ -10,12 +10,18 @@ def get_and_write_data(url):
 
     # Вычленяем карточки компаний
     elements = parsed_html.select(
-        'div.styles_businessUnitCardsContainer__1ggaO a.link_internal__YpiJI.link_wrapper__LEdx5')
+        'div.styles_businessUnitCardsContainer__1ggaO > a.link_internal__YpiJI.link_wrapper__LEdx5')
 
     file = open(f'results/{filename}', "a")
     # Записываем урлы из карточек в цикле
     for el in elements:
-        file.write(el.get('href').split('/')[2] + '\n')
+        try:
+            file.write(el.get('href').split('/')[2] + '\n')
+        except:
+            print('================================')
+            print(el.get('href'))
+            print('Что-то не так, но это не страшно')
+            print('================================')
 
     file.close()
 
@@ -33,9 +39,12 @@ base_url = 'https://www.trustpilot.com'
 
 # Получем стартовый урл из команды запуска скрипта и последний аргумент берем в качестве названия файла
 start_url = sys.argv[1]
-filename = start_url.split('/')[-1] + '.csv'
+filename = start_url.split('/')[-1].split('?')[0] + '.csv'
 
 # очистка файла
+# Если парсинг прерывается, то, возможно сайт начал блокировать IP из-за большого количества запросов
+# В этом случае надо включить впн, закомментировать три строки внизу
+# и перезапустить парсер с урлом, содержащим get-параметр страницы page
 file = open(f'results/{filename}', "w")
 file.write("")
 file.close()
